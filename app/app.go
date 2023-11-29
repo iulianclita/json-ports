@@ -10,6 +10,13 @@ import (
 	"time"
 )
 
+const (
+	logLevelDebug = "DEBUG"
+	logLevelInfo  = "INFO"
+	logLevelWarn  = "WARN"
+	logLevelError = "ERROR"
+)
+
 type Config struct {
 	LogLevel              string `env:"LOG_LEVEL" envDefault:"INFO"`
 	ServerAddress         string `env:"SERVER_ADDRESS" envDefault:"127.0.0.1:8080"`
@@ -24,9 +31,28 @@ type App struct {
 }
 
 func New(cfg Config) *App {
+	var logLevel slog.Level
+	switch cfg.LogLevel {
+	case logLevelDebug:
+		logLevel = slog.LevelDebug
+	case logLevelInfo:
+		logLevel = slog.LevelInfo
+	case logLevelWarn:
+		logLevel = slog.LevelWarn
+	case logLevelError:
+		logLevel = slog.LevelError
+	default:
+		logLevel = slog.LevelInfo
+	}
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		AddSource: true,
+		Level:     logLevel,
+	}))
+
+	mux := http.NewServeMux()
 	server := &http.Server{
 		Addr:         cfg.ServerAddress,
-		Handler:      http.NewServeMux(),
+		Handler:      mux,
 		ReadTimeout:  time.Duration(cfg.ReadTimeoutInSeconds) * time.Second,
 		WriteTimeout: time.Duration(cfg.WriteTimeoutInSeconds) * time.Second,
 	}
@@ -34,13 +60,14 @@ func New(cfg Config) *App {
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-
-	return &App{
+	app := App{
 		logger: logger,
 		server: server,
 		done:   done,
 	}
+	app.registerRoutes(mux)
+
+	return &app
 }
 
 func (app *App) Start() {
