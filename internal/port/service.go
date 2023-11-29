@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/iulianclita/json-ports/internal/port/domain"
-	"github.com/iulianclita/json-ports/internal/port/infra"
 )
 
 type Service interface {
@@ -17,9 +16,9 @@ type portService struct {
 	repo Repository
 }
 
-func NewService() Service {
+func NewService(repo Repository) Service {
 	return &portService{
-		repo: infra.NewMemoryDB(),
+		repo: repo,
 	}
 }
 

@@ -4,11 +4,9 @@ export GOBIN=$(CURDIR)/bin
 # Default to the system 'go'.
 GO?=$(shell which go)
 
-$(GOBIN):
-	mkdir -p $(GOBIN)
-
-.PHONY: setup-lint
+.PHONY: setup
 setup: ## Set up local linting tool
+	mkdir -p $(GOBIN)
 	cd $(GOBIN)
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.55.2
 
@@ -21,9 +19,5 @@ lint: ## Lint the source code.
 	$(GOBIN)/golangci-lint run --config $(shell pwd)/build/.golangci.yml --verbose ./...
 
 .PHONY: tests
-tests: ## Run all test (unit + integration)
-	$(GO) test -v -race -tags=integration ./...
-
-.PHONY: unit-tests
-tests: ## Run only unit tests
+tests: ## Run all tests
 	$(GO) test -v -race ./...

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/iulianclita/json-ports/internal/port"
+	"github.com/iulianclita/json-ports/internal/port/infra"
 )
 
 const (
@@ -67,7 +68,7 @@ func New(cfg Config) *App {
 		logger:      logger,
 		server:      server,
 		done:        done,
-		portService: port.NewService(),
+		portService: port.NewService(infra.NewMemoryDB()),
 	}
 	app.registerRoutes(mux)
 
@@ -78,7 +79,7 @@ func (app *App) Start() {
 	go func() {
 		if err := app.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			app.logger.Error("failed to listen", err)
-			os.Exit(1)
+			os.Exit(99)
 		}
 	}()
 	app.logger.Info("server started", "address", app.server.Addr)
@@ -93,7 +94,7 @@ func (app *App) Stop() {
 
 	if err := app.server.Shutdown(ctx); err != nil {
 		app.logger.Error("failed to shutdown the http server", err)
-		os.Exit(2)
+		return
 	}
 	app.logger.Info("server shutdown successfully")
 }

@@ -46,6 +46,10 @@ func ParseUpsertPortRequest(req *http.Request) ([]*domain.Port, error) {
 
 	var domainPorts []*domain.Port
 	for id, reqPort := range reqPorts {
+		// skip empty id fields
+		if id == "" {
+			continue
+		}
 		domainPorts = append(domainPorts, &domain.Port{
 			ID:          id,
 			Name:        reqPort.Name,
