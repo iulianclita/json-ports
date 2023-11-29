@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/iulianclita/json-ports/internal/domain"
+	"github.com/iulianclita/json-ports/internal/port/domain"
 )
 
 const (

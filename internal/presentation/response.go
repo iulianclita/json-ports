@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/iulianclita/json-ports/internal/domain"
+	"github.com/iulianclita/json-ports/internal/port/domain"
 )
 
 type ResponsePort struct {
@@ -22,7 +22,7 @@ type ResponsePort struct {
 	Code        string    `json:"code"`
 }
 
-func PrepareUpsertPortResponse(domainPorts []*domain.Port) []ResponsePort {
+func PrepareGetPortsResponse(domainPorts []*domain.Port) []ResponsePort {
 	responsePorts := make([]ResponsePort, len(domainPorts))
 	for i, domainPort := range domainPorts {
 		responsePorts[i] = ResponsePort{
@@ -44,6 +44,13 @@ func PrepareUpsertPortResponse(domainPorts []*domain.Port) []ResponsePort {
 }
 
 func SendResponse(w http.ResponseWriter, res any, status int, logger *slog.Logger) {
+	w.WriteHeader(status)
+	w.Header().Set("Content-Type", "application/json")
+
+	if res == nil {
+		return
+	}
+
 	data, err := json.Marshal(res)
 	if err != nil {
 		logger.Warn("failed to marshal response data", err)
@@ -51,8 +58,6 @@ func SendResponse(w http.ResponseWriter, res any, status int, logger *slog.Logge
 		return
 	}
 
-	w.WriteHeader(status)
-	w.Header().Set("Content-Type", "application/json")
 	if _, err := w.Write(data); err != nil {
 		logger.Warn("failed to send response", err)
 	}

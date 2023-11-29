@@ -8,6 +8,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/iulianclita/json-ports/internal/port"
 )
 
 const (
@@ -25,9 +27,10 @@ type Config struct {
 }
 
 type App struct {
-	logger *slog.Logger
-	server *http.Server
-	done   chan os.Signal
+	logger      *slog.Logger
+	server      *http.Server
+	done        chan os.Signal
+	portService port.Service
 }
 
 func New(cfg Config) *App {
@@ -61,9 +64,10 @@ func New(cfg Config) *App {
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	app := App{
-		logger: logger,
-		server: server,
-		done:   done,
+		logger:      logger,
+		server:      server,
+		done:        done,
+		portService: port.NewService(),
 	}
 	app.registerRoutes(mux)
 
