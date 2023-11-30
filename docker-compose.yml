@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  webapp:
+    build:
+      context: .
+      target: webapp
+    environment:
+      SERVER_ADDRESS: :8080
+    ports:
+      - "8080:8080"
+
+
+
