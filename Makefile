@@ -11,7 +11,7 @@ setup: ## Set up local linting tool
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.55.2
 
 .PHONY: clean
-clean: ## Remove build artifacts.
+clean: ## Remove all build artifacts.
 	rm -rf $(GOBIN)
 
 .PHONY: lint
@@ -21,3 +21,11 @@ lint: ## Lint the source code.
 .PHONY: tests
 tests: ## Run all tests
 	$(GO) test -v -race ./...
+
+.PHONY: up
+up: ## start docker compose
+	docker compose up -d
+
+.PHONY: down
+down: ## stop docker compose
+	docker compose down  
