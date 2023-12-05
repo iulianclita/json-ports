@@ -28,7 +28,7 @@ type RequestPorts map[string]struct {
 
 func ParseUpsertPortRequest(req *http.Request) ([]*domain.Port, error) {
 	if err := req.ParseMultipartForm(maxMemoryInMB * 1024 * 1024); err != nil {
-		return nil, fmt.Errorf("faild to parse multipart form upsert port request: %w", err)
+		return nil, fmt.Errorf("failed to parse multipart form upsert port request: %w", err)
 	}
 
 	file, _, err := req.FormFile("ports")
